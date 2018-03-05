@@ -168,32 +168,45 @@ class Multigame:
         return self._sumStat_gamelossprob.get_mean()
 
 
-mygame = SetOfGames(0.5,1000)
-print('95% CI of expected reward is',mygame.get_CI_reward(0.05))
 
-print('95% CI of loss probability is',mygame.get_CI_reward(0.05))
+
+NUM1=1000
+multigame = Multigame(
+    ids=range(NUM1),   # [0, 1, 2 ..., NUM_SIM_COHORTS-1]
+    pop_sizes=[1000] * NUM1,  # [REAL_POP_SIZE, REAL_POP_SIZE, ..., REAL_POP_SIZE]
+    prob_head=[0.5]*NUM1  # [p, p, ....]
+)
+# simulate all cohorts
+multigame.simulate(NUM1)
+print('95% CI of loss probability is',multigame.get_PI_loss_prob(0.05))
+print('95% CI of expected reward is', multigame.get_PI_mean_reward(0.05))
+
 
 
 
 
 #Problem2
-print('')
+print('If you repeat the simulation many times, the proportion of the CI that cover the true mean is expected to be 95%')
 
 #Problem3
 NUM=1000
 multigame1 = Multigame(
     ids=range(NUM),   # [0, 1, 2 ..., NUM_SIM_COHORTS-1]
-    pop_sizes=[20] * NUM,  # [REAL_POP_SIZE, REAL_POP_SIZE, ..., REAL_POP_SIZE]
+    pop_sizes=[1000] * NUM,  # [REAL_POP_SIZE, REAL_POP_SIZE, ..., REAL_POP_SIZE]
     prob_head=[0.5]*NUM  # [p, p, ....]
 )
 # simulate all cohorts
 multigame1.simulate(NUM)
+tmp = multigame1.get_PI_mean_reward(0.05)
+tmp = [i * -1 for i in tmp]
+tmp[0], tmp[1] = tmp[1], tmp[0]
 
-print('The expected reward for casino owner is', multigame1.get_overall_mean_reward() ,'with a projection interval of', multigame1.get_PI_mean_reward(0.05))
-NUM2 = 10
+
+print('The expected reward for casino owner is', -1*multigame1.get_overall_mean_reward() ,'with a projection interval of', tmp)
+NUM2 = 1000
 multigame2 = Multigame(
     ids=range(NUM2),   # [0, 1, 2 ..., NUM_SIM_COHORTS-1]
-    pop_sizes=[20] * NUM2,  # [REAL_POP_SIZE, REAL_POP_SIZE, ..., REAL_POP_SIZE]
+    pop_sizes=[10] * NUM2,  # [REAL_POP_SIZE, REAL_POP_SIZE, ..., REAL_POP_SIZE]
     prob_head=[0.5]*NUM2  # [p, p, ....]
 )
 # simulate all cohorts
@@ -201,3 +214,7 @@ multigame2.simulate(NUM2)
 
 
 print('The expected reward of a gambler is ',multigame2.get_overall_mean_reward(),'with a projection interval of ',multigame2.get_PI_mean_reward(0.05))
+
+
+print('If you repeat the simulation many times, the proportion of the CIs that cover the true average reward of the casino owner is expected to be 95%.')
+print('The next realization of expected reward of the gambler will fall in the projection interval',multigame2.get_PI_mean_reward(0.05),'with probability 95%. ')
